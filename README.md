@@ -12,7 +12,7 @@ An unopinionated way to integrate rxjs with redux.
 
 ```typescript jsx
 import {filter, mapTo} from 'rxjs/operators'
-import {createRxMiddleware} from './'
+import {createRxMiddleware} from 'redux-middleware-rxjs'
 
 const middleware = createRxMiddleware(
     obs=> obs.pipe(
