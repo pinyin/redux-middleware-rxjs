@@ -1,11 +1,16 @@
 import {Action, Dispatch, Middleware, MiddlewareAPI} from 'redux'
-import {OperatorFunction, Subject} from 'rxjs'
+import {Observable, OperatorFunction, Subject} from 'rxjs'
 
-export function createRxMiddleware<A extends Action>(func: OperatorFunction<A, A>): Middleware {
+export function createRxMiddleware<A extends Action>(...funcs: Array<OperatorFunction<A, A>>): Middleware {
     const middleware: Middleware = (store: MiddlewareAPI) => (next: Dispatch<A>) => {
         const actions = new Subject<A>()
 
-        func(actions).subscribe(action => store.dispatch(action))
+        if (funcs.length < 1) {
+            throw new Error(`Must provide at least 1 operator`)
+        }
+
+        funcs.reduce((prev, curr) => curr(prev), actions as Observable<A>)
+            .subscribe(action => store.dispatch(action))
 
         return (action: A) => {
             const result = next(action)
